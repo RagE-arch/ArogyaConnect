@@ -1,0 +1,1319 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AarogyaConnect 360 - Universal Healthcare Ecosystem</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Leaflet Maps CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/static/css/style.css">
+
+  <style>
+    /* =============================================
+       AarogyaConnect 360 v2.0 – Dashboard Shell
+    ============================================= */
+    html, body { height: 100%; overflow: hidden; }
+
+    /* --- APP SHELL --- */
+    .app-shell { display: flex; height: 100vh; overflow: hidden; background: #f8fafc; }
+
+    /* --- SIDEBAR --- */
+    .sidebar {
+      width: 210px; min-width: 210px;
+      background: #ffffff;
+      border-right: 1px solid #e2e8f0;
+      display: flex; flex-direction: column;
+      overflow: hidden; z-index: 20;
+      transition: transform 0.25s ease;
+    }
+    .sidebar-logo { padding: 18px 18px 14px; border-bottom: 1px solid #f1f5f9; }
+    .sidebar-nav { flex: 1; padding: 8px 0; overflow-y: auto; }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 18px;
+      font-size: 13px; font-weight: 500; color: #64748b;
+      cursor: pointer; transition: all 0.15s;
+      border-left: 3px solid transparent;
+      user-select: none;
+    }
+    .nav-item:hover { background: #f0f9ff; color: #0284c7; border-left-color: #bae6fd; }
+    .nav-item.active { background: #eff6ff; color: #1d4ed8; font-weight: 700; border-left-color: #2563eb; }
+    .nav-item.nav-emergency { color: #dc2626; }
+    .nav-item.nav-emergency:hover { background: #fff1f2; border-left-color: #fca5a5; }
+    .nav-item.nav-emergency.active { background: #fff1f2; color: #dc2626; border-left-color: #dc2626; }
+    .nav-divider { margin: 6px 16px; border-top: 1px solid #f1f5f9; }
+    .sidebar-user {
+      padding: 12px 16px; border-top: 1px solid #f1f5f9;
+      flex-shrink: 0;
+    }
+
+    /* --- MAIN WRAPPER --- */
+    .main-wrapper { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+
+    /* --- TOP HEADER --- */
+    .top-header {
+      background: #ffffff; border-bottom: 1px solid #e2e8f0;
+      padding: 0 20px; height: 58px;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-shrink: 0; z-index: 30; box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+
+    /* --- SCROLLABLE PAGE AREA --- */
+    .page-area { flex: 1; overflow-y: auto; padding: 20px; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* --- PAGE PANELS --- */
+    .page-panel { display: none; animation: fadeIn 0.18s ease; }
+    .page-panel.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* --- WIDGET CARD --- */
+    .widget-card {
+      background: #ffffff; border: 1px solid #e2e8f0;
+      border-radius: 14px; padding: 16px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    }
+
+    /* --- VOICE AI BUTTON --- */
+    .voice-orb-wrapper { position: relative; display: flex; align-items: center; justify-content: center; }
+    .voice-ring-outer, .voice-ring-inner {
+      position: absolute; border-radius: 50%;
+      background: rgba(14, 165, 233, 0.1);
+      animation: voicePulse 2.2s ease-in-out infinite;
+    }
+    .voice-ring-outer { width: 190px; height: 190px; }
+    .voice-ring-inner { width: 150px; height: 150px; animation-delay: 0.4s; background: rgba(14, 165, 233, 0.13); }
+    @keyframes voicePulse {
+      0%, 100% { transform: scale(0.95); opacity: 0.5; }
+      50% { transform: scale(1.06); opacity: 1; }
+    }
+    .voice-btn-main {
+      width: 108px; height: 108px; border-radius: 50%;
+      background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 50%, #0d9488 100%);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; border: none;
+      box-shadow: 0 8px 28px rgba(6, 182, 212, 0.42);
+      transition: transform 0.2s, box-shadow 0.2s;
+      position: relative; z-index: 2;
+    }
+    .voice-btn-main:hover { transform: scale(1.06); box-shadow: 0 12px 36px rgba(6, 182, 212, 0.55); }
+    .voice-btn-main:active { transform: scale(0.96); }
+    .voice-btn-main.listening {
+      background: linear-gradient(135deg, #dc2626, #ef4444);
+      box-shadow: 0 8px 28px rgba(220, 38, 38, 0.45);
+      animation: listenPulse 1s ease-in-out infinite;
+    }
+    @keyframes listenPulse {
+      0%, 100% { box-shadow: 0 8px 28px rgba(220,38,38,0.4); }
+      50% { box-shadow: 0 8px 44px rgba(220,38,38,0.7); }
+    }
+    .speak-btn {
+      display: flex; align-items: center; gap: 7px;
+      padding: 11px 28px; border-radius: 50px; border: none; cursor: pointer;
+      background: linear-gradient(90deg, #0ea5e9, #06b6d4);
+      color: #fff; font-size: 13px; font-weight: 700;
+      box-shadow: 0 4px 16px rgba(6,182,212,0.35);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .speak-btn:hover { transform: scale(1.04); box-shadow: 0 6px 22px rgba(6,182,212,0.45); }
+
+    /* Mini Map */
+    #mini-map-container { width: 100%; height: 155px; border-radius: 10px; overflow: hidden; }
+
+    /* Queue mini progress */
+    .queue-bar-track { background: #e2e8f0; border-radius: 9999px; height: 6px; overflow: hidden; }
+    .queue-bar-fill { background: linear-gradient(90deg, #0284c7, #0d9488, #10b981); height: 100%; border-radius: 9999px; animation: shimmer 2.5s linear infinite; background-size: 200% 100%; }
+
+    /* Badge */
+    .badge { display: inline-flex; align-items: center; padding: 2px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+    .badge-taken { background: #dcfce7; color: #16a34a; }
+    .badge-in-person { background: #e0f2fe; color: #0369a1; }
+    .badge-scheduled { background: #fef3c7; color: #92400e; }
+
+    /* Patient tab content (legacy, still used inside page panels) */
+    .patient-tab-content { }
+
+    /* Hospital / family tab content */
+    .hospital-tab-content { display: none; }
+    .hospital-tab-content.active-htab { display: block; }
+
+    /* Mark taken button */
+    .mark-taken-btn {
+      width: 100%; padding: 7px 0; border-radius: 10px; border: none; cursor: pointer;
+      background: #16a34a; color: #fff; font-size: 12px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      transition: background 0.15s;
+    }
+    .mark-taken-btn:hover { background: #15803d; }
+
+    /* Global Search Overlay */
+    #global-search-overlay {
+      position: fixed; inset: 0; z-index: 9999;
+      background: rgba(15,23,42,0.55); backdrop-filter: blur(4px);
+      display: flex; align-items: flex-start; justify-content: center;
+      padding-top: 80px;
+    }
+    #global-search-overlay.hidden { display: none; }
+    .search-box {
+      background: #fff; border-radius: 18px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.22);
+      width: 100%; max-width: 580px; margin: 0 16px;
+      overflow: hidden;
+    }
+    .search-input-row {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 18px; border-bottom: 1px solid #f1f5f9;
+    }
+    .search-input-row input {
+      flex: 1; border: none; outline: none;
+      font-size: 15px; font-weight: 500; color: #0f172a; background: transparent;
+    }
+    .search-result-item {
+      display: flex; align-items: center; gap-12px;
+      padding: 10px 16px; cursor: pointer; border-radius: 8px; gap: 12px;
+      transition: background 0.12s;
+    }
+    .search-result-item:hover { background: #f0f9ff; }
+    .search-result-icon {
+      width: 34px; height: 34px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* Mobile sidebar toggle */
+    .mobile-sidebar-overlay {
+      display: none; position: fixed; inset: 0; z-index: 19;
+      background: rgba(0,0,0,0.4);
+    }
+    @media (max-width: 768px) {
+      .sidebar { position: fixed; left: 0; top: 0; bottom: 0; transform: translateX(-100%); }
+      .sidebar.mobile-open { transform: translateX(0); }
+      .mobile-sidebar-overlay.show { display: block; }
+      .page-area { padding: 14px; }
+    }
+  </style>
+</head>
+
+<body class="h-full">
+
+<!-- ============================================================ -->
+<!-- APP SHELL                                                     -->
+<!-- ============================================================ -->
+<div class="app-shell" id="app-shell">
+
+  <!-- Mobile sidebar overlay -->
+  <div class="mobile-sidebar-overlay" id="mobile-overlay" onclick="App.closeMobileSidebar()"></div>
+
+  <!-- ===== LEFT SIDEBAR ===== -->
+  <aside class="sidebar" id="sidebar">
+
+    <!-- Logo -->
+    <div class="sidebar-logo">
+      <div class="flex items-center gap-2.5 cursor-pointer" onclick="App.goHome()">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-sky-600 to-teal-500 text-white flex items-center justify-center shadow-md flex-shrink-0">
+          <i data-lucide="activity" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <div class="font-black text-sm text-slate-900 leading-tight">AarogyaConnect</div>
+          <div class="text-[10px] text-slate-500 font-medium leading-tight">Your Health. Our Priority.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="sidebar-nav no-scrollbar" id="sidebar-nav">
+      <div class="nav-item active" id="nav-home" onclick="App.goToPage('home')">
+        <i data-lucide="home" style="width:16px;height:16px;flex-shrink:0"></i>
+        <span>Home</span>
+      </div>
+      <div class="nav-item" id="nav-myhealth" onclick="App.goToPage('myhealth')">
+        <i data-lucide="heart-pulse" style="width:16px;height:16px;flex-shrink:0"></i>
+        <span>My Health</span>
+      </div>
+      <div class="nav-item" id="nav-appointments" onclick="App.goToPage('appointments')">
+        <i data-lucide="calendar-check" style="width:16px;height:16px;flex-shrink:0"></i>
+        <span>Appointments</span>
+      </div>
+      <div class="nav-item" id="nav-medicines" onclick="App.goToPage('medicines')">
+        <i data-lucide="pill" style="width:16px;height:16px;flex-shrink:0"></i>
+        <span>Medicines</span>
+      </div>
+      <div class="nav-item" id="nav-reports" onclick="App.goToPage('reports')">
+        <i data-lucide="file-text" style="width:16px;height:16px;flex-shrink:0"></i>
+        <span>Reports</span>
+      </div>
+      <div class="nav-item" id="nav-nearbycare" onclick="App.goToPage('nearbycare')">
+        <i data-lucide="map-pin" style="width:16px;height:16px;flex-shrink:0"></i>
+        <span>Nearby Care</span>
+      </div>
+      <div class="nav-item" id="nav-healthlocker" onclick="App.goToPage('healthlocker')">
+        <i data-lucide="folder-lock" style="width:16px;height:16px;flex-shrink:0"></i>
+        <span>Health Locker</span>
+      </div>
+      <div class="nav-divider"></div>
+      <div class="nav-item" id="nav-voice" onclick="App.goToPage('voice')">
+        <i data-lucide="mic" style="width:16px;height:16px;flex-shrink:0"></i>
+        <span>Voice AI</span>
+      </div>
+      <div class="nav-item" id="nav-diet" onclick="App.goToPage('diet')">
+        <i data-lucide="salad" style="width:16px;height:16px;flex-shrink:0"></i>
+        <span>Diet Planner</span>
+      </div>
+      <div class="nav-item" id="nav-schemes" onclick="App.goToPage('schemes')">
+        <i data-lucide="landmark" style="width:16px;height:16px;flex-shrink:0"></i>
+        <span>Govt Schemes</span>
+      </div>
+      <div class="nav-item" id="nav-insurance" onclick="App.goToPage('insurance')">
+        <i data-lucide="shield-check" style="width:16px;height:16px;flex-shrink:0"></i>
+        <span>Insurance</span>
+      </div>
+      <div class="nav-item" id="nav-companion" onclick="App.goToPage('companion')">
+        <i data-lucide="heart-handshake" style="width:16px;height:16px;flex-shrink:0"></i>
+        <span>Care Companion</span>
+      </div>
+      <div class="nav-divider"></div>
+      <div class="nav-item nav-emergency" id="nav-emergency" onclick="App.goToPage('emergency')">
+        <i data-lucide="siren" style="width:16px;height:16px;flex-shrink:0"></i>
+        <span>Emergency SOS</span>
+      </div>
+    </nav>
+
+    <!-- Bottom User Profile -->
+    <div class="sidebar-user">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-sky-600 to-indigo-600 text-white font-bold flex items-center justify-center text-xs shadow flex-shrink-0">RV</div>
+        <div class="min-w-0">
+          <div class="text-xs font-bold text-slate-800 truncate">Rahul Verma</div>
+          <div class="text-[10px] text-slate-500">Patient • B+ • 48 Yrs</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ===== MAIN WRAPPER ===== -->
+  <div class="main-wrapper" id="main-wrapper">
+
+    <!-- TOP HEADER -->
+    <header class="top-header" id="top-header">
+      <div class="flex items-center gap-3">
+        <!-- Mobile hamburger -->
+        <button class="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 md:hidden" onclick="App.toggleMobileSidebar()">
+          <i data-lucide="menu" class="w-5 h-5"></i>
+        </button>
+
+        <!-- Role Switcher -->
+        <div class="flex items-center bg-slate-100 p-0.5 rounded-xl border border-slate-200">
+          <button id="btn-role-patient" onclick="App.switchRole('patient')" class="role-nav-btn px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-sky-600 text-white shadow-md">
+            <i data-lucide="user" class="w-3.5 h-3.5"></i>
+            <span data-i18n="role_patient">Patient</span>
+          </button>
+          <button id="btn-role-hospital" onclick="App.switchRole('hospital')" class="role-nav-btn px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-transparent text-slate-600 hover:bg-slate-200">
+            <i data-lucide="hospital" class="w-3.5 h-3.5"></i>
+            <span data-i18n="role_hospital" class="hidden sm:inline">Hospital &amp; Doctor</span>
+          </button>
+          <button id="btn-role-family" onclick="App.switchRole('family')" class="role-nav-btn px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-transparent text-slate-600 hover:bg-slate-200">
+            <i data-lucide="users" class="w-3.5 h-3.5"></i>
+            <span data-i18n="role_family" class="hidden sm:inline">Family (View-only)</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <!-- Search button -->
+        <button onclick="App.toggleGlobalSearch()" class="p-2 rounded-lg hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition" title="Search (Ctrl+K)">
+          <i data-lucide="search" class="w-4 h-4"></i>
+        </button>
+
+        <!-- Language selector with globe icon -->
+        <div class="relative hidden sm:block">
+          <select id="global-language-selector" class="text-xs font-bold py-1.5 pl-7 pr-2.5 rounded-lg border border-slate-200 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer appearance-none">
+            <option value="en">English</option>
+            <option value="hi">हिन्दी</option>
+            <option value="bn">বাংলা</option>
+            <option value="te">తెలుగు</option>
+            <option value="ta">தமிழ்</option>
+            <option value="mr">मराठी</option>
+          </select>
+          <i data-lucide="globe" class="w-3.5 h-3.5 absolute left-2 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+        </div>
+
+        <!-- Emergency SOS -->
+        <button onclick="App.switchRole('patient'); App.goToPage('emergency');" class="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-extrabold flex items-center gap-1.5 shadow-sm animate-emergency-beacon transition">
+          <i data-lucide="alert-triangle" class="w-4 h-4"></i>
+          <span class="hidden sm:inline" data-i18n="btn_sos">EMERGENCY SOS</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Emergency Live Dispatch Banner -->
+    <div id="emergency-live-dispatch-banner" class="px-5 hidden"></div>
+
+    <!-- ===== GLOBAL SEARCH OVERLAY ===== -->
+    <div id="global-search-overlay" class="hidden">
+      <div class="search-box">
+        <div class="search-input-row">
+          <i data-lucide="search" class="w-5 h-5 text-slate-400 flex-shrink-0"></i>
+          <input type="text" id="global-search-input"
+            placeholder="Search doctors, medicines, features…"
+            oninput="App.runGlobalSearch(this.value)"
+            onkeydown="App.handleSearchKey(event)"
+            autocomplete="off">
+          <button onclick="App.toggleGlobalSearch()" class="text-xs text-slate-400 border border-slate-200 rounded px-2 py-1 font-mono hover:bg-slate-50">Esc</button>
+        </div>
+        <div id="global-search-results" class="p-3 max-h-96 overflow-y-auto">
+          <div class="py-8 text-center text-slate-400 text-sm">
+            <i data-lucide="search" class="w-8 h-8 mx-auto mb-2 opacity-30"></i>
+            <p class="font-medium">Type to search features, doctors, medicines…</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== MAIN PAGE AREA ===== -->
+    <main class="page-area" id="main-page-area">
+
+      <!-- ====================================================== -->
+      <!-- PATIENT PORTAL                                         -->
+      <!-- ====================================================== -->
+      <div id="panel-patient-role">
+
+        <!-- ─── PAGE: HOME DASHBOARD ─── -->
+        <div id="page-home" class="page-panel active space-y-4">
+
+          <!-- Greeting -->
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 class="text-xl font-black text-slate-900">Good Evening, Rahul 👋</h2>
+              <p class="text-xs text-slate-500 mt-0.5">Tuesday, 13 October 2026 &nbsp;•&nbsp; ABHA: 91-4521-8890-1234</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-1.5">
+              <span class="badge bg-amber-100 text-amber-800">Type 2 Diabetes</span>
+              <span class="badge bg-red-100 text-red-700">Hypertension</span>
+              <span class="badge bg-rose-100 text-rose-700">⚠ Lactose Allergy</span>
+            </div>
+          </div>
+
+          <!-- 3-Column Top Row -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+
+            <!-- Col 1 – Map + OPD (3/12) -->
+            <div class="lg:col-span-3 space-y-4">
+
+              <!-- Map Widget -->
+              <div class="widget-card">
+                <div class="flex items-center justify-between mb-3">
+                  <div class="flex items-center gap-2">
+                    <i data-lucide="map-pin" class="w-4 h-4 text-sky-600"></i>
+                    <span class="text-sm font-bold text-slate-800">Map</span>
+                  </div>
+                  <button onclick="App.goToPage('nearbycare')" class="text-xs text-sky-600 font-semibold hover:underline flex items-center gap-0.5">
+                    View full map <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                  </button>
+                </div>
+                <div id="mini-map-container"></div>
+              </div>
+
+              <!-- OPD Line Widget -->
+              <div class="widget-card">
+                <div class="flex items-center justify-between mb-3">
+                  <div class="flex items-center gap-2">
+                    <i data-lucide="clock" class="w-4 h-4 text-amber-500"></i>
+                    <span class="text-sm font-bold text-slate-800">OPD Line</span>
+                  </div>
+                  <button onclick="App.goToPage('appointments')" class="text-xs text-sky-600 font-semibold hover:underline flex items-center gap-0.5">
+                    View all <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                  </button>
+                </div>
+                <div class="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
+                  <div class="w-9 h-9 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
+                    <i data-lucide="users" class="w-4 h-4 text-amber-600"></i>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="text-sm font-bold text-slate-900">OPD Token #44</div>
+                    <div class="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
+                      <i data-lucide="users" class="w-3 h-3"></i> 5 patients ahead
+                    </div>
+                  </div>
+                  <span class="badge bg-sky-100 text-sky-800 text-[10px] flex-shrink-0">~25 min</span>
+                </div>
+                <div class="mt-3 space-y-1">
+                  <div class="queue-bar-track">
+                    <div class="queue-bar-fill" style="width:50%"></div>
+                  </div>
+                  <div class="flex justify-between text-[10px] text-slate-400 font-medium">
+                    <span>Currently: #39</span>
+                    <span>Your turn: #44</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Col 2 – AI Voice Button (6/12) -->
+            <div class="lg:col-span-6">
+              <div class="widget-card flex flex-col items-center justify-center text-center py-10 space-y-5 h-full min-h-[370px]">
+                <!-- Pulsing orb -->
+                <div class="voice-orb-wrapper">
+                  <div class="voice-ring-outer"></div>
+                  <div class="voice-ring-inner"></div>
+                  <button id="dashboard-voice-btn" class="voice-btn-main"
+                    onclick="App.goToPage('voice'); setTimeout(() => VoiceAI.toggleListen(), 350);">
+                    <i data-lucide="mic" style="width:40px;height:40px;color:white"></i>
+                  </button>
+                </div>
+
+                <div class="space-y-1">
+                  <h3 class="text-xl font-black text-slate-900">AI Voice Button</h3>
+                  <p class="text-xs text-slate-500 max-w-[240px]">Speak symptoms, book appointments, or get health advice in your language</p>
+                </div>
+
+                <button class="speak-btn" onclick="App.goToPage('voice')">
+                  <i data-lucide="mic" style="width:15px;height:15px"></i>
+                  Tap to speak
+                </button>
+
+                <div class="flex flex-wrap justify-center gap-2 text-xs">
+                  <button onclick="App.goToPage('voice')" class="px-3 py-1.5 bg-slate-100 hover:bg-sky-50 text-slate-600 hover:text-sky-700 rounded-full border border-slate-200 transition font-medium">
+                    📅 Book appointment
+                  </button>
+                  <button onclick="App.goToPage('nearbycare')" class="px-3 py-1.5 bg-slate-100 hover:bg-sky-50 text-slate-600 hover:text-sky-700 rounded-full border border-slate-200 transition font-medium">
+                    🏥 Find nearby doctors
+                  </button>
+                  <button onclick="App.goToPage('voice')" class="px-3 py-1.5 bg-slate-100 hover:bg-sky-50 text-slate-600 hover:text-sky-700 rounded-full border border-slate-200 transition font-medium">
+                    🩺 Check symptoms
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Col 3 – Medicine Reminders + Appointments (3/12) -->
+            <div class="lg:col-span-3 space-y-4">
+
+              <!-- Medicine Reminders Widget -->
+              <div class="widget-card">
+                <div class="flex items-center justify-between mb-3">
+                  <div class="flex items-center gap-2">
+                    <i data-lucide="pill" class="w-4 h-4 text-emerald-600"></i>
+                    <span class="text-sm font-bold text-slate-800">Medicine Reminders</span>
+                  </div>
+                  <button onclick="App.goToPage('medicines')" class="text-xs text-sky-600 font-semibold hover:underline flex items-center gap-0.5">
+                    View all <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                  </button>
+                </div>
+                <div class="p-3 bg-slate-50 rounded-xl space-y-3">
+                  <div class="flex items-start gap-2.5">
+                    <div class="w-9 h-9 rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <i data-lucide="pill" class="w-4 h-4 text-amber-500"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <div class="flex items-start justify-between gap-1">
+                        <span class="text-xs font-bold text-slate-900 leading-tight">Metformin 500mg</span>
+                        <span class="badge badge-taken text-[10px] flex-shrink-0 mt-0.5">Taken 2/3 days</span>
+                      </div>
+                      <div class="text-[11px] text-slate-500 mt-0.5">1 tablet • After breakfast</div>
+                      <div class="flex items-center gap-1 mt-1 text-[10px] text-slate-400">
+                        <i data-lucide="calendar" class="w-2.5 h-2.5"></i> Today • 8:00 AM
+                      </div>
+                    </div>
+                  </div>
+                  <button class="mark-taken-btn">
+                    <i data-lucide="check" style="width:13px;height:13px"></i> Mark taken
+                  </button>
+                </div>
+                <p class="mt-2 text-center text-[11px] text-slate-400 font-medium cursor-pointer hover:text-sky-600" onclick="App.goToPage('medicines')">+ 2 more medicines today →</p>
+              </div>
+
+              <!-- Appointments Widget -->
+              <div class="widget-card">
+                <div class="flex items-center justify-between mb-3">
+                  <div class="flex items-center gap-2">
+                    <i data-lucide="calendar-check" class="w-4 h-4 text-indigo-500"></i>
+                    <span class="text-sm font-bold text-slate-800">Appointments</span>
+                  </div>
+                  <button onclick="App.goToPage('appointments')" class="text-xs text-sky-600 font-semibold hover:underline flex items-center gap-0.5">
+                    View all <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                  </button>
+                </div>
+                <div class="p-3 bg-slate-50 rounded-xl">
+                  <div class="flex items-start gap-2.5">
+                    <div class="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0">
+                      <i data-lucide="user" class="w-4 h-4 text-indigo-600"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-slate-900">Dr. Rajesh Sharma</span>
+                        <button onclick="App.goToPage('appointments')" class="text-slate-300 hover:text-slate-500">
+                          <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                        </button>
+                      </div>
+                      <div class="text-[11px] text-slate-500">Cardiologist</div>
+                      <span class="badge badge-in-person text-[10px] mt-1">In-person</span>
+                      <div class="flex items-center gap-1 mt-1.5 text-[10px] text-slate-400">
+                        <i data-lucide="calendar" class="w-2.5 h-2.5"></i> Today, Oct 13 • 4:30 PM
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="mt-3 p-3 bg-slate-50 rounded-xl">
+                  <div class="flex items-start gap-2.5">
+                    <div class="w-9 h-9 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0">
+                      <i data-lucide="user" class="w-4 h-4 text-emerald-600"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <span class="text-xs font-bold text-slate-900">Dr. Ananya Iyer</span>
+                      <div class="text-[11px] text-slate-500">Diabetologist</div>
+                      <div class="flex items-center gap-1 mt-1.5 text-[10px] text-slate-400">
+                        <i data-lucide="calendar" class="w-2.5 h-2.5"></i> Oct 18 • 10:00 AM
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Row – Charts -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+
+            <!-- Health Progress Chart (Blood Glucose) -->
+            <div class="widget-card">
+              <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center gap-2">
+                  <i data-lucide="trending-up" class="w-4 h-4 text-teal-600"></i>
+                  <span class="text-sm font-bold text-slate-800">Health Progress</span>
+                </div>
+                <button onclick="App.goToPage('myhealth')" class="text-xs text-sky-600 font-semibold hover:underline flex items-center gap-1">
+                  Last 6 months <i data-lucide="chevron-down" class="w-3 h-3"></i>
+                </button>
+              </div>
+              <p class="text-[11px] font-semibold text-slate-500 mb-2">Blood Glucose (mg/dL)</p>
+              <div style="height:180px;">
+                <canvas id="dashboard-glucose-chart"></canvas>
+              </div>
+            </div>
+
+            <!-- Health Metrics Chart (BP) -->
+            <div class="widget-card">
+              <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center gap-2">
+                  <i data-lucide="bar-chart-2" class="w-4 h-4 text-indigo-600"></i>
+                  <span class="text-sm font-bold text-slate-800">Health Metrics</span>
+                </div>
+                <button onclick="App.goToPage('myhealth')" class="text-xs text-sky-600 font-semibold hover:underline flex items-center gap-1">
+                  Last 6 months <i data-lucide="chevron-down" class="w-3 h-3"></i>
+                </button>
+              </div>
+              <p class="text-[11px] font-semibold text-slate-500 mb-2">Systolic Blood Pressure (mmHg)</p>
+              <div style="height:180px;">
+                <canvas id="dashboard-bp-chart"></canvas>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <!-- /page-home -->
+
+        <!-- ─── PAGE: VOICE AI ─── -->
+        <div id="page-voice" class="page-panel space-y-6">
+          <div class="flex items-center gap-3">
+            <button onclick="App.goHome()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition">
+              <i data-lucide="arrow-left" class="w-4 h-4"></i> Back
+            </button>
+            <h2 class="text-base font-black text-slate-900">Voice AI &amp; Slot Assistant</h2>
+          </div>
+
+          <div class="glass-card rounded-2xl p-6 border border-sky-100 shadow-sm space-y-5">
+            <div class="text-center space-y-1">
+              <span class="badge-pill bg-sky-100 text-sky-800 text-xs">Multilingual AI Medical Voice</span>
+              <h3 class="text-xl font-black text-slate-900 mt-1" data-i18n="voice_ai_title">Speak Your Health Problem or Book a Doctor</h3>
+              <p class="text-xs text-slate-500 max-w-xl mx-auto" data-i18n="voice_ai_sub">Speak in English, Hindi, Bengali, Telugu, Tamil, or Marathi. The AI will diagnose symptoms, recommend nearby specialists, and speak available time slots.</p>
+            </div>
+
+            <!-- Language Pills -->
+            <div class="flex flex-wrap justify-center gap-2">
+              <button type="button" onclick="I18n.setLanguage('en')" class="px-2.5 py-1 rounded-lg border text-xs font-bold transition hover:bg-sky-50 bg-white text-slate-700 border-slate-200">🇬🇧 English</button>
+              <button type="button" onclick="I18n.setLanguage('hi')" class="px-2.5 py-1 rounded-lg border text-xs font-bold transition hover:bg-sky-50 bg-white text-slate-700 border-slate-200">🇮🇳 हिन्दी</button>
+              <button type="button" onclick="I18n.setLanguage('bn')" class="px-2.5 py-1 rounded-lg border text-xs font-bold transition hover:bg-sky-50 bg-white text-slate-700 border-slate-200">🇮🇳 বাংলা</button>
+              <button type="button" onclick="I18n.setLanguage('te')" class="px-2.5 py-1 rounded-lg border text-xs font-bold transition hover:bg-sky-50 bg-white text-slate-700 border-slate-200">🇮🇳 తెలుగు</button>
+              <button type="button" onclick="I18n.setLanguage('ta')" class="px-2.5 py-1 rounded-lg border text-xs font-bold transition hover:bg-sky-50 bg-white text-slate-700 border-slate-200">🇮🇳 தமிழ்</button>
+              <button type="button" onclick="I18n.setLanguage('mr')" class="px-2.5 py-1 rounded-lg border text-xs font-bold transition hover:bg-sky-50 bg-white text-slate-700 border-slate-200">🇮🇳 मराठी</button>
+            </div>
+
+            <!-- Mic Circle + Stop Voice -->
+            <div class="flex flex-col items-center space-y-4 py-4">
+              <div class="relative flex items-center justify-center">
+                <button id="btn-voice-mic" onclick="VoiceAI.toggleListen()" class="w-24 h-24 rounded-full bg-sky-600 hover:bg-sky-700 text-white flex items-center justify-center shadow-xl transition transform hover:scale-105 active:scale-95">
+                  <i data-lucide="mic" class="w-8 h-8 text-white"></i>
+                </button>
+              </div>
+              <button id="btn-voice-stop" onclick="VoiceAI.stopAll()" class="hidden px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold shadow-md transition flex items-center gap-1.5 animate-pulse">
+                <i data-lucide="volume-x" class="w-4 h-4"></i>
+                <span data-i18n="voice_btn_stop">⏹️ Stop Voice</span>
+              </button>
+              <div id="voice-wave-indicator" class="items-center gap-1 h-8 hidden">
+                <span class="w-1.5 bg-sky-600 rounded-full wave-bar"></span>
+                <span class="w-1.5 bg-sky-600 rounded-full wave-bar"></span>
+                <span class="w-1.5 bg-sky-600 rounded-full wave-bar"></span>
+                <span class="w-1.5 bg-sky-600 rounded-full wave-bar"></span>
+                <span class="w-1.5 bg-sky-600 rounded-full wave-bar"></span>
+              </div>
+              <p id="voice-status-text" class="text-xs font-semibold text-slate-500 text-center" data-i18n="voice_status_ready">Tap the microphone to speak, or type below</p>
+            </div>
+
+            <!-- Query Input -->
+            <div class="max-w-2xl mx-auto space-y-3">
+              <div class="flex items-center gap-2">
+                <input type="text" id="voice-query-input" placeholder="e.g. I have severe chest pain and breathlessness" data-i18n-placeholder="voice_placeholder" class="flex-1 p-3 text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-sm bg-white">
+                <button onclick="VoiceAI.processVoiceQuery(document.getElementById('voice-query-input').value)" class="px-5 py-3 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-sm font-bold shadow-md transition">
+                  <span data-i18n="voice_btn_analyze">Analyze &amp; Speak</span>
+                </button>
+              </div>
+              <div id="voice-quick-prompts-container" class="flex flex-wrap items-center gap-1.5 text-xs"></div>
+            </div>
+
+            <!-- AI Response Card -->
+            <div id="voice-response-card" class="max-w-2xl mx-auto p-5 bg-sky-50/70 border border-sky-200 rounded-2xl space-y-4 hidden relative">
+              <div class="flex items-start justify-between">
+                <div class="flex items-start gap-3">
+                  <div class="w-8 h-8 rounded-full bg-sky-600 text-white flex items-center justify-center shrink-0">
+                    <i data-lucide="bot" class="w-4 h-4"></i>
+                  </div>
+                  <div>
+                    <h4 class="font-bold text-slate-900 text-xs uppercase tracking-wider text-sky-800">Voice Assistant Response</h4>
+                    <p id="voice-response-spoken" class="text-sm text-slate-800 mt-1 leading-relaxed font-medium"></p>
+                  </div>
+                </div>
+                <button onclick="VoiceAI.closeVoiceResponseCard()" class="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition" title="Close / Silence">
+                  <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+              </div>
+              <div id="voice-recommendations-box"></div>
+            </div>
+
+            <!-- Bottom Back Button -->
+            <div class="pt-4 border-t border-slate-200 flex items-center justify-between">
+              <button onclick="App.goHome()" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs transition">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i> <span data-i18n="back_to_services">Back to Home</span>
+              </button>
+              <button onclick="window.scrollTo({top:0,behavior:'smooth'})" class="text-xs font-semibold text-sky-600 hover:underline">↑ Back to Top</button>
+            </div>
+          </div>
+        </div>
+        <!-- /page-voice -->
+
+        <!-- ─── PAGE: APPOINTMENTS (Queue) ─── -->
+        <div id="page-appointments" class="page-panel space-y-6">
+          <div class="flex items-center gap-3">
+            <button onclick="App.goHome()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition">
+              <i data-lucide="arrow-left" class="w-4 h-4"></i> Back
+            </button>
+            <h2 class="text-base font-black text-slate-900">Appointments &amp; OPD Queue</h2>
+          </div>
+
+          <!-- OPD Queue Card (migrated from tab-content-queue) -->
+          <div class="glass-card rounded-2xl p-6 border border-sky-100 shadow-sm max-w-2xl space-y-6">
+            <div class="text-center space-y-1">
+              <span class="badge-pill bg-sky-100 text-sky-800 text-xs">Live OPD Flow Management</span>
+              <h3 class="text-2xl font-black text-slate-900">Your OPD Token Status</h3>
+              <p id="queue-doctor-room" class="text-xs font-semibold text-sky-700">Dr. Rajesh Sharma • OPD Cabin 204 (Apollo Multispeciality)</p>
+            </div>
+            <div class="grid grid-cols-2 gap-4 p-5 bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-2xl shadow-lg">
+              <div class="text-center border-r border-slate-700 pr-2">
+                <span class="text-[11px] uppercase tracking-wider text-slate-400 font-bold">Currently Serving</span>
+                <div id="queue-current-token" class="text-4xl sm:text-5xl font-black text-amber-400 mt-1">#39</div>
+                <span class="text-[10px] text-slate-400 block mt-1">In Doctor Cabin</span>
+              </div>
+              <div class="text-center pl-2">
+                <span class="text-[11px] uppercase tracking-wider text-slate-400 font-bold">Your Token Number</span>
+                <div id="queue-patient-token" class="text-4xl sm:text-5xl font-black text-emerald-400 mt-1">#44</div>
+                <span class="text-[10px] text-emerald-300 block mt-1">Scheduled for Today</span>
+              </div>
+            </div>
+            <div class="space-y-3 p-4 bg-sky-50 rounded-2xl border border-sky-200">
+              <div class="flex items-center justify-between text-xs">
+                <span id="queue-patients-ahead" class="text-slate-800 font-semibold text-sm">Your number will be after <strong>5 more patients</strong></span>
+                <span class="badge-pill bg-sky-200 text-sky-900 font-bold" id="queue-est-wait">~25 mins</span>
+              </div>
+              <div class="w-full bg-slate-200 rounded-full h-4 overflow-hidden border border-slate-300 p-0.5">
+                <div id="queue-progress-bar" class="queue-progress-bar h-full rounded-full transition-all duration-700" style="width:50%;"></div>
+              </div>
+              <div class="flex items-center justify-between text-[11px] text-slate-500 font-semibold">
+                <span>Token 35</span>
+                <span id="queue-progress-percent">50% Completed</span>
+                <span>Your Turn: #44</span>
+              </div>
+            </div>
+
+            <!-- Queue Advice Banner -->
+            <div class="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl text-xs space-y-1">
+              <p class="font-bold text-emerald-800">💡 Smart Queue Advice</p>
+              <p class="text-emerald-700">You have approximately <strong>25 minutes</strong> before your turn. You may arrive at the hospital in about 15 minutes to avoid waiting in the physical queue area.</p>
+            </div>
+
+            <!-- Today's Appointments -->
+            <div class="space-y-3">
+              <h4 class="font-bold text-slate-900 text-sm">All Scheduled Appointments</h4>
+              <div id="patient-appointments-list" class="space-y-3"></div>
+            </div>
+          </div>
+        </div>
+        <!-- /page-appointments -->
+
+        <!-- ─── PAGE: MEDICINES (Pharmacy) ─── -->
+        <div id="page-medicines" class="page-panel space-y-6">
+          <div class="flex items-center gap-3">
+            <button onclick="App.goHome()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition">
+              <i data-lucide="arrow-left" class="w-4 h-4"></i> Back
+            </button>
+            <h2 class="text-base font-black text-slate-900">Prescriptions &amp; Medicines</h2>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Upload Form -->
+            <div class="space-y-4">
+              <div class="p-5 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                <div class="space-y-1">
+                  <span class="badge-pill bg-sky-100 text-sky-800 text-xs">Doorstep Medicine Delivery</span>
+                  <h4 class="font-extrabold text-slate-900 text-base">Upload Prescription</h4>
+                  <p class="text-xs text-slate-500">Every uploaded prescription is double-checked by hospital clinical pharmacists before delivery.</p>
+                </div>
+                <form id="form-rx-upload" class="space-y-3">
+                  <div class="border-2 border-dashed border-sky-300 rounded-xl p-4 text-center bg-sky-50/50 hover:bg-sky-50 transition cursor-pointer">
+                    <i data-lucide="upload-cloud" class="w-8 h-8 mx-auto text-sky-600 mb-1"></i>
+                    <span class="text-xs font-bold text-sky-800 block">Select Rx Image or PDF</span>
+                    <input type="file" id="rx-file-upload" class="text-xs text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-sky-600 file:text-white mt-2">
+                  </div>
+                  <div>
+                    <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Medicines / Notes</label>
+                    <textarea id="rx-medications-text" rows="2" placeholder="e.g. Metformin 500mg, Telmisartan 40mg" class="w-full p-2.5 text-xs rounded-xl border border-slate-300"></textarea>
+                  </div>
+                  <button type="submit" class="w-full py-2.5 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-xs font-bold shadow-md transition">Upload &amp; Request Double-Check</button>
+                </form>
+              </div>
+              <div id="anti-abuse-controlled-card"></div>
+              <div class="space-y-2">
+                <h5 class="text-xs font-bold uppercase tracking-wider text-slate-500">Uploaded Orders</h5>
+                <div id="patient-prescriptions-list" class="space-y-3"></div>
+              </div>
+            </div>
+            <!-- Active Medicines (2 cols) -->
+            <div class="lg:col-span-2 space-y-4">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h4 class="font-bold text-slate-900 text-base">Smart Medication Schedule &amp; Clinical Guide</h4>
+                  <p class="text-xs text-slate-500">Know exactly why each medicine is prescribed and why it is critical for your recovery.</p>
+                </div>
+              </div>
+              <div id="patient-medicines-reminders-list" class="space-y-4"></div>
+            </div>
+          </div>
+        </div>
+        <!-- /page-medicines -->
+
+        <!-- ─── PAGE: DIET ─── -->
+        <div id="page-diet" class="page-panel space-y-6">
+          <div class="flex items-center gap-3">
+            <button onclick="App.goHome()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition">
+              <i data-lucide="arrow-left" class="w-4 h-4"></i> Back
+            </button>
+            <h2 class="text-base font-black text-slate-900">Diet Plan &amp; Meal Checker</h2>
+          </div>
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="space-y-4">
+              <div class="p-5 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                <div class="space-y-1">
+                  <span class="badge-pill bg-emerald-100 text-emerald-800 text-xs">AI Meal Analyzer</span>
+                  <h4 class="font-extrabold text-slate-900 text-base">Check Any Food Safety</h4>
+                  <p class="text-xs text-slate-500">Instant safety verification against your Diabetes, Hypertension, and Lactose allergy.</p>
+                </div>
+                <div class="space-y-2">
+                  <input type="text" id="food-search-input" placeholder="e.g. Samosa, Paneer Tikka, Moong Dal..." class="w-full p-2.5 text-xs rounded-xl border border-slate-300">
+                  <button onclick="DietAgent.checkMealItem()" class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-md transition">Analyze Food Safety</button>
+                </div>
+                <div class="flex flex-wrap gap-1 text-[11px]">
+                  <span class="text-slate-400 block w-full mb-1">Quick Check:</span>
+                  <button onclick="DietAgent.checkMealItem('Samosa')" class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 hover:bg-slate-200">Samosa</button>
+                  <button onclick="DietAgent.checkMealItem('Paneer Butter Masala')" class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 hover:bg-slate-200">Paneer Tikka</button>
+                  <button onclick="DietAgent.checkMealItem('Moong Dal Cheela')" class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 hover:bg-slate-200">Moong Cheela</button>
+                  <button onclick="DietAgent.checkMealItem('Karela Juice')" class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 hover:bg-slate-200">Karela Juice</button>
+                </div>
+                <div id="food-analysis-result-box" class="hidden"></div>
+              </div>
+              <div class="p-5 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-3">
+                <h5 class="text-xs font-bold uppercase tracking-wider text-slate-500">Diagnosed Medical Restrictions</h5>
+                <ul id="diet-strict-restrictions-list" class="space-y-2"></ul>
+              </div>
+            </div>
+            <div class="lg:col-span-2 space-y-4">
+              <div class="p-5 bg-white rounded-2xl border border-slate-200 shadow-sm">
+                <span class="badge-pill bg-emerald-100 text-emerald-800 text-xs mb-2">Prescribed Clinical Diet</span>
+                <h4 id="diet-condition-target" class="text-base font-extrabold text-slate-900 mt-1"></h4>
+                <p class="text-xs text-slate-500 mt-0.5">Designed to maintain glycemic stability, optimize vascular tension, and avoid allergic triggers.</p>
+              </div>
+              <div id="diet-meals-schedule-list" class="space-y-3"></div>
+            </div>
+          </div>
+        </div>
+        <!-- /page-diet -->
+
+        <!-- ─── PAGE: MY HEALTH (Trends) ─── -->
+        <div id="page-myhealth" class="page-panel space-y-6">
+          <div class="flex items-center gap-3">
+            <button onclick="App.goHome()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition">
+              <i data-lucide="arrow-left" class="w-4 h-4"></i> Back
+            </button>
+            <h2 class="text-base font-black text-slate-900">AI Health Trajectory Charts</h2>
+          </div>
+          <div class="space-y-6">
+            <div id="patient-ai-health-verdict"></div>
+            <div id="patient-metrics-cards-grid" class="grid grid-cols-2 lg:grid-cols-4 gap-4"></div>
+            <div class="p-5 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-4">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h4 class="font-extrabold text-slate-900 text-base">6-Month AI Health Trajectory Chart</h4>
+                  <p class="text-xs text-slate-500">Visualizing Fasting Glucose, Systolic Blood Pressure, and HbA1c normalization.</p>
+                </div>
+                <span class="badge-pill bg-emerald-100 text-emerald-800 text-xs font-bold">Trend: Progressive Improvement</span>
+              </div>
+              <div class="h-80 w-full">
+                <canvas id="chart-patient-trends"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- /page-myhealth -->
+
+        <!-- ─── PAGE: REPORTS (Health Locker documents + lab reports) ─── -->
+        <div id="page-reports" class="page-panel space-y-6">
+          <div class="flex items-center gap-3">
+            <button onclick="App.goHome()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition">
+              <i data-lucide="arrow-left" class="w-4 h-4"></i> Back
+            </button>
+            <h2 class="text-base font-black text-slate-900">Reports &amp; Lab Results</h2>
+          </div>
+          <div class="p-5 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <span class="badge-pill bg-sky-100 text-sky-800 text-xs">Encrypted Medical Locker</span>
+                <h4 class="font-extrabold text-slate-900 text-base mt-1">Lab Reports &amp; Documents</h4>
+              </div>
+              <button onclick="App.uploadLockerDocument()" class="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-xs font-bold shadow-md transition flex items-center gap-1.5">
+                <i data-lucide="plus" class="w-4 h-4"></i> Add Document
+              </button>
+            </div>
+            <div id="health-locker-docs-grid-reports" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+          </div>
+        </div>
+        <!-- /page-reports -->
+
+        <!-- ─── PAGE: NEARBY CARE (Map) ─── -->
+        <div id="page-nearbycare" class="page-panel space-y-6">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <button onclick="App.goHome()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i> Back
+              </button>
+              <h2 class="text-base font-black text-slate-900">Doctor Map &amp; Nearby Care</h2>
+            </div>
+            <button onclick="MapLocator.closeMap()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs transition">
+              <i data-lucide="x" class="w-4 h-4"></i> Close Map
+            </button>
+          </div>
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="space-y-4">
+              <div class="p-4 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-3">
+                <h4 class="font-bold text-slate-900 text-sm">Find Nearby Specialists</h4>
+                <input type="text" id="map-search-query" oninput="MapLocator.filterBySearch(this.value)" placeholder="Search doctor, hospital, condition..." class="w-full p-2.5 text-xs rounded-xl border border-slate-300">
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Filter by Specialty</label>
+                  <select onchange="MapLocator.filterBySpecialty(this.value)" class="w-full p-2 text-xs rounded-xl border border-slate-300 bg-white">
+                    <option value="all">All Specialties</option>
+                    <option value="Cardiologist">Cardiology (Heart)</option>
+                    <option value="Diabetologist">Diabetology &amp; Internal Med</option>
+                    <option value="Orthopedic">Orthopedics (Bones/Joints)</option>
+                    <option value="Neurologist">Neurology (Brain/Nerves)</option>
+                    <option value="Pulmonologist">Pulmonology (Lungs/Chest)</option>
+                  </select>
+                </div>
+              </div>
+              <div id="map-doctors-list" class="space-y-3 max-h-[500px] overflow-y-auto pr-1"></div>
+            </div>
+            <div class="lg:col-span-2">
+              <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col h-[600px]">
+                <div class="p-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between text-xs font-semibold text-slate-600">
+                  <span>📍 Nearby Hospitals &amp; Doctor Clinics (Bellandur Radius)</span>
+                  <button onclick="MapLocator.closeMap()" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-xs transition">
+                    <i data-lucide="x" class="w-3.5 h-3.5"></i> Close Map
+                  </button>
+                </div>
+                <div id="map-view-container" class="flex-1 w-full h-full"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- /page-nearbycare -->
+
+        <!-- ─── PAGE: HEALTH LOCKER ─── -->
+        <div id="page-healthlocker" class="page-panel space-y-6">
+          <div class="flex items-center gap-3">
+            <button onclick="App.goHome()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition">
+              <i data-lucide="arrow-left" class="w-4 h-4"></i> Back
+            </button>
+            <h2 class="text-base font-black text-slate-900">Digital Health Locker &amp; Bills</h2>
+          </div>
+          <div class="p-5 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <span class="badge-pill bg-sky-100 text-sky-800 text-xs">Encrypted Medical Locker</span>
+                <h4 class="font-extrabold text-slate-900 text-base mt-1">Online Document Keeper &amp; Bills</h4>
+                <p class="text-xs text-slate-500">Store and categorize prescriptions, lab reports, scans, and hospital discharge bills.</p>
+              </div>
+              <button onclick="App.uploadLockerDocument()" class="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-xs font-bold shadow-md transition flex items-center gap-1.5">
+                <i data-lucide="plus" class="w-4 h-4"></i> Add Document
+              </button>
+            </div>
+            <div id="health-locker-docs-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"></div>
+          </div>
+        </div>
+        <!-- /page-healthlocker -->
+
+        <!-- ─── PAGE: GOVT SCHEMES ─── -->
+        <div id="page-schemes" class="page-panel space-y-6">
+          <div class="flex items-center gap-3">
+            <button onclick="App.goHome()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition">
+              <i data-lucide="arrow-left" class="w-4 h-4"></i> Back
+            </button>
+            <h2 class="text-base font-black text-slate-900">Govt Schemes, ABHA &amp; DigiLocker</h2>
+          </div>
+          <div id="pmjay-scheme-details"></div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-3">
+              <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500">National Health ID</h4>
+              <div id="abha-card-render"></div>
+            </div>
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500">DigiLocker Integration</h4>
+                <span class="badge-pill bg-sky-100 text-sky-800 text-[10px]">Connected &amp; Verified</span>
+              </div>
+              <div id="digilocker-docs-list" class="space-y-2"></div>
+            </div>
+          </div>
+        </div>
+        <!-- /page-schemes -->
+
+        <!-- ─── PAGE: INSURANCE ─── -->
+        <div id="page-insurance" class="page-panel space-y-6">
+          <div class="flex items-center gap-3">
+            <button onclick="App.goHome()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition">
+              <i data-lucide="arrow-left" class="w-4 h-4"></i> Back
+            </button>
+            <h2 class="text-base font-black text-slate-900">Insurance Claim Concierge</h2>
+          </div>
+          <div id="insurance-desk-card"></div>
+        </div>
+        <!-- /page-insurance -->
+
+        <!-- ─── PAGE: CARE COMPANION ─── -->
+        <div id="page-companion" class="page-panel space-y-6">
+          <div class="flex items-center gap-3">
+            <button onclick="App.goHome()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition">
+              <i data-lucide="arrow-left" class="w-4 h-4"></i> Back
+            </button>
+            <h2 class="text-base font-black text-slate-900">On-Demand Care Companion</h2>
+          </div>
+          <div id="care-companion-card"></div>
+        </div>
+        <!-- /page-companion -->
+
+        <!-- ─── PAGE: EMERGENCY SOS ─── -->
+        <div id="page-emergency" class="page-panel space-y-6">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <button onclick="App.goHome()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs transition border border-slate-200">
+                <i data-lucide="arrow-left" class="w-4 h-4 text-red-600"></i> Back to Safety
+              </button>
+            </div>
+            <span class="text-xs font-bold text-red-600 uppercase">Emergency Support Mode</span>
+          </div>
+          <div class="glass-card rounded-2xl p-6 sm:p-8 border-2 border-red-200 shadow-xl max-w-3xl mx-auto space-y-6">
+            <div class="text-center space-y-2">
+              <span class="badge-pill bg-red-100 text-red-800 text-xs font-bold uppercase tracking-wider">Emergency Medical Dispatch Hub</span>
+              <h2 class="text-3xl font-black text-slate-900">Urgent Medical Assistance</h2>
+              <p class="text-xs text-slate-600 max-w-lg mx-auto">Pressing the Emergency SOS button immediately broadcasts your live GPS coordinates, medical history, and dispatches an ACLS ambulance from the nearest hospital trauma center.</p>
+            </div>
+            <div class="flex justify-center py-4">
+              <button onclick="EmergencyHub.triggerEmergencySOS()" class="w-36 h-36 rounded-full bg-red-600 hover:bg-red-700 text-white flex flex-col items-center justify-center shadow-2xl transition transform hover:scale-105 active:scale-95 animate-emergency-beacon border-4 border-white">
+                <i data-lucide="siren" class="w-12 h-12 text-white"></i>
+                <span class="font-black text-xl tracking-wider mt-1">SOS</span>
+              </button>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-center">
+              <a href="tel:1066" class="p-3 bg-red-50 hover:bg-red-100 rounded-xl border border-red-200 text-xs font-bold text-red-700 transition">📞 Apollo Emergency: 1066</a>
+              <a href="tel:108" class="p-3 bg-red-50 hover:bg-red-100 rounded-xl border border-red-200 text-xs font-bold text-red-700 transition">🚑 National Ambulance: 108</a>
+              <a href="tel:112" class="p-3 bg-red-50 hover:bg-red-100 rounded-xl border border-red-200 text-xs font-bold text-red-700 transition">🚨 Police &amp; Rescue: 112</a>
+            </div>
+            <div class="border-t border-slate-200 pt-4 space-y-3">
+              <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500">Immediate First-Aid Protocols</h4>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
+                  <strong class="text-red-700 block">🫀 Chest Pain / Attack</strong>
+                  <p class="text-slate-600">Chew 1 soluble Aspirin 300mg immediately. Rest sitting upright. Loosen tight clothing.</p>
+                </div>
+                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
+                  <strong class="text-red-700 block">🧠 Stroke (F.A.S.T)</strong>
+                  <p class="text-slate-600">Check Face drooping, Arm weakness, Speech slurring. Call ambulance immediately.</p>
+                </div>
+                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
+                  <strong class="text-red-700 block">🫁 Breathlessness</strong>
+                  <p class="text-slate-600">Use prescribed bronchodilator inhaler (2 puffs with spacer). Keep windows open.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- /page-emergency -->
+
+      </div>
+      <!-- /panel-patient-role -->
+
+      <!-- ====================================================== -->
+      <!-- HOSPITAL PORTAL                                        -->
+      <!-- ====================================================== -->
+      <div id="panel-hospital-role" class="hidden space-y-6">
+
+        <!-- Hospital Quick Return Bar -->
+        <div class="flex items-center justify-between p-3.5 bg-white rounded-2xl border border-slate-200 shadow-sm">
+          <button onclick="App.switchRole('patient')" class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-800 font-bold text-xs transition border border-sky-200 shadow-xs">
+            <i data-lucide="arrow-left" class="w-4 h-4 text-sky-600"></i>
+            <span data-i18n="back_to_patient_portal">← Back to Patient Portal</span>
+          </button>
+          <span class="text-xs text-slate-500 font-semibold">Hospital Command Desk</span>
+          <button onclick="App.switchRole('family')" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs transition">Family Portal →</button>
+        </div>
+
+        <!-- Hospital Header Banner -->
+        <div class="glass-card rounded-2xl p-5 border border-sky-100">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-sky-700 to-indigo-800 text-white flex items-center justify-center font-bold text-xl shadow-md">🏥</div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <h2 class="text-lg font-bold text-slate-900">Apollo Multispeciality Hospital - OPD &amp; Clinical Operations</h2>
+                  <span class="badge-pill bg-emerald-100 text-emerald-800 text-xs">Hospital Staff Portal</span>
+                </div>
+                <p class="text-xs text-slate-500">Bannerghatta Main Road, Bengaluru • In-Charge: Dr. Rajesh Sharma, MD, DM</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 text-xs">
+              <span class="px-3 py-1 bg-sky-50 text-sky-800 rounded-lg font-bold border border-sky-200">Active Doctors On-Duty: 14</span>
+              <span class="px-3 py-1 bg-emerald-50 text-emerald-800 rounded-lg font-bold border border-emerald-200">ICU Ambulances: 4 Ready</span>
+            </div>
+          </div>
+          <!-- Hospital Subnav -->
+          <div class="flex items-center gap-2 overflow-x-auto pt-3 text-xs font-semibold no-scrollbar">
+            <button id="hosp-tab-btn-queue" onclick="App.switchHospitalTab('queue')" class="hospital-subnav-btn px-3 py-2 rounded-lg border-b-2 border-sky-600 text-sky-600 font-bold whitespace-nowrap flex items-center gap-1.5 transition">
+              <i data-lucide="list-ordered" class="w-4 h-4"></i> OPD Queue &amp; Appointments
+            </button>
+            <button id="hosp-tab-btn-diff" onclick="App.switchHospitalTab('diff')" class="hospital-subnav-btn px-3 py-2 rounded-lg border-b-2 border-transparent text-slate-500 font-medium whitespace-nowrap flex items-center gap-1.5 hover:text-sky-600 transition">
+              <i data-lucide="git-compare" class="w-4 h-4"></i> AI 10-Day Report Diff
+            </button>
+            <button id="hosp-tab-btn-pharmacy" onclick="App.switchHospitalTab('pharmacy')" class="hospital-subnav-btn px-3 py-2 rounded-lg border-b-2 border-transparent text-slate-500 font-medium whitespace-nowrap flex items-center gap-1.5 hover:text-sky-600 transition">
+              <i data-lucide="shield-alert" class="w-4 h-4"></i> Anti-Abuse Rx &amp; Dispensation Counter
+            </button>
+            <button id="hosp-tab-btn-emergency" onclick="App.switchHospitalTab('emergency')" class="hospital-subnav-btn px-3 py-2 rounded-lg border-b-2 border-transparent text-slate-500 font-medium whitespace-nowrap flex items-center gap-1.5 hover:text-sky-600 transition">
+              <i data-lucide="siren" class="w-4 h-4"></i> Emergency Fleet &amp; Trauma Control
+            </button>
+          </div>
+        </div>
+
+        <!-- HOSPITAL TAB 1: OPD Queue -->
+        <div id="hosp-tab-content-queue" class="hospital-tab-content active-htab space-y-6">
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="p-5 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-5">
+              <div class="space-y-1">
+                <span class="badge-pill bg-sky-100 text-sky-800 text-xs">Doctor OPD Control Desk</span>
+                <h4 class="font-extrabold text-slate-900 text-base">Live Token Advancer</h4>
+                <p class="text-xs text-slate-500">Advance queue when consultation finishes. Automatically notifies patient and updates their progress bar.</p>
+              </div>
+              <div class="p-5 bg-slate-900 text-white rounded-2xl text-center space-y-2">
+                <span class="text-xs uppercase tracking-wider text-slate-400 font-bold">Currently Inside Cabin</span>
+                <div id="hosp-current-token" class="text-5xl font-black text-amber-400">#39</div>
+                <span class="text-xs text-slate-400 block">Next in Line: <strong id="hosp-next-token" class="text-emerald-400 font-mono">#40</strong></span>
+              </div>
+              <div class="space-y-2">
+                <button onclick="QueueManager.hospitalAdvanceToken()" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-bold shadow-md transition flex items-center justify-center gap-2">
+                  <i data-lucide="arrow-right-circle" class="w-5 h-5"></i> Call Next Patient (#40)
+                </button>
+                <button onclick="QueueManager.hospitalAdvanceToken()" class="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-bold transition">
+                  Skip / No-Show (Call #41)
+                </button>
+              </div>
+            </div>
+            <div class="lg:col-span-2">
+              <div id="hospital-appointments-table" class="p-5 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                <h4 class="font-bold text-slate-900 text-base">Today's OPD Patient Roster</h4>
+                <div id="hospital-roster-list" class="space-y-3"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- HOSPITAL TAB 2: AI Report Diff -->
+        <div id="hosp-tab-content-diff" class="hospital-tab-content space-y-6">
+          <div id="hospital-report-diff-card"></div>
+        </div>
+
+        <!-- HOSPITAL TAB 3: Anti-Abuse Pharmacy -->
+        <div id="hosp-tab-content-pharmacy" class="hospital-tab-content space-y-6">
+          <div id="hospital-pharmacy-counter-card"></div>
+        </div>
+
+        <!-- HOSPITAL TAB 4: Emergency Fleet -->
+        <div id="hosp-tab-content-emergency" class="hospital-tab-content space-y-6">
+          <div id="hospital-emergency-fleet-card"></div>
+        </div>
+      </div>
+      <!-- /panel-hospital-role -->
+
+      <!-- ====================================================== -->
+      <!-- FAMILY PORTAL                                          -->
+      <!-- ====================================================== -->
+      <div id="panel-family-role" class="hidden space-y-6">
+        <!-- PIN Gate -->
+        <div id="family-pin-gate" class="max-w-md mx-auto">
+          <div class="glass-card rounded-2xl p-8 border border-indigo-100 shadow-xl space-y-6 text-center">
+            <div class="w-16 h-16 rounded-2xl bg-indigo-600 text-white flex items-center justify-center mx-auto shadow-lg">
+              <i data-lucide="shield-check" class="w-8 h-8"></i>
+            </div>
+            <div>
+              <h3 class="text-xl font-black text-slate-900">Family Guardian Portal</h3>
+              <p class="text-xs text-slate-500 mt-2">View-Only Access for Authorized Family Members of Rahul Verma. Protected by patient-set PIN for data privacy.</p>
+            </div>
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-600 text-left">
+              <strong>Demo Authorization PIN:</strong> <span class="font-mono font-bold text-indigo-700">CARE2026</span><br>
+              <span class="text-[11px] text-slate-500">Pre-authorized for Sunita Verma (Wife) &amp; Rohan Verma (Son)</span>
+            </div>
+            <div class="space-y-3">
+              <input type="password" id="family-pin-input" placeholder="Enter 8-digit Guardian PIN" value="CARE2026" class="w-full p-3 text-center text-lg font-mono tracking-widest rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <button onclick="FamilyManager.authenticate()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-bold shadow-md transition">Unlock View-Only Portal</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Authenticated View-Only Dashboard -->
+        <div id="family-view-dashboard" class="space-y-6 hidden">
+          <div class="glass-card rounded-2xl p-5 border border-indigo-100">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-full bg-indigo-600 text-white font-bold flex items-center justify-center text-xl shadow-md">🛡️</div>
+                <div>
+                  <div class="flex items-center gap-2">
+                    <h3 class="font-black text-base text-slate-900">Guardian View-Only Mode</h3>
+                    <span class="badge-pill bg-emerald-100 text-emerald-800 text-xs font-bold">Data Protected</span>
+                  </div>
+                  <p class="text-xs text-slate-500">Logged in as: <strong id="family-guardian-name" class="text-indigo-700"></strong></p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                <button onclick="App.switchRole('patient')" class="px-3.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-800 border border-indigo-200 rounded-xl text-xs font-bold transition flex items-center gap-1.5">
+                  <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Patient Portal
+                </button>
+                <button onclick="FamilyManager.lockBack()" class="px-3 py-1.5 border border-slate-200 text-slate-600 hover:bg-slate-50 rounded-xl text-xs font-bold transition">🔒 Lock &amp; Exit</button>
+              </div>
+            </div>
+          </div>
+          <div id="family-patient-badge"></div>
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="p-5 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-3">
+              <div class="flex items-center justify-between">
+                <h4 class="font-extrabold text-slate-900 text-sm">Real-time Caregiver &amp; Vitals Feed</h4>
+                <span class="badge-pill bg-emerald-100 text-emerald-800 text-[10px]">Attendant: Sister Priya</span>
+              </div>
+              <p class="text-xs text-slate-500">Live monitoring logs updated directly by the attending clinical caregiver.</p>
+              <div id="family-vitals-feed" class="space-y-2"></div>
+            </div>
+            <div class="p-5 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-4">
+              <div>
+                <h4 class="font-extrabold text-slate-900 text-sm">Medicine Doses &amp; Compliance Tracker</h4>
+                <p class="text-xs text-slate-500">Ensure your loved one never misses a critical dose or doctor consultation.</p>
+              </div>
+              <div class="space-y-2">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Daily Medication Status</span>
+                <div id="family-meds-reminders-list" class="space-y-2"></div>
+              </div>
+              <div class="space-y-2 pt-2 border-t border-slate-100">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Upcoming Appointments</span>
+                <div id="family-appointments-list" class="space-y-2"></div>
+              </div>
+            </div>
+          </div>
+          <div class="p-5 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-3">
+            <div class="flex items-center justify-between">
+              <h4 class="font-extrabold text-slate-900 text-sm">Latest Verified Lab Report Summary (Oct 13)</h4>
+              <span class="badge-pill bg-sky-100 text-sky-800 text-xs">Apollo Diagnostic Labs</span>
+            </div>
+            <div id="family-lab-summary"></div>
+          </div>
+        </div>
+      </div>
+      <!-- /panel-family-role -->
+
+    </main>
+    <!-- /page-area -->
+
+  </div>
+  <!-- /main-wrapper -->
+
+</div>
+<!-- /app-shell -->
+
+<!-- ===== BOOKING MODAL ===== -->
+<div id="booking-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+  <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
+    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+      <div class="flex items-center gap-2">
+        <button onclick="document.getElementById('booking-modal').classList.add('hidden')" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition" title="Back / Close">
+          <i data-lucide="arrow-left" class="w-4 h-4"></i>
+        </button>
+        <h3 class="font-bold text-slate-900 text-base">Book Doctor Consultation</h3>
+      </div>
+      <button onclick="document.getElementById('booking-modal').classList.add('hidden')" class="text-slate-400 hover:text-slate-600">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+    </div>
+    <div id="booking-modal-body"></div>
+  </div>
+</div>
+
+<!-- ===== TOAST CONTAINER ===== -->
+<div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm pointer-events-none"></div>
+
+<!-- ===== SCRIPTS ===== -->
+<script src="/static/js/i18n.js"></script>
+<script src="/static/js/voice_ai.js"></script>
+<script src="/static/js/queue.js"></script>
+<script src="/static/js/map.js"></script>
+<script src="/static/js/charts.js"></script>
+<script src="/static/js/pharmacy.js"></script>
+<script src="/static/js/diet_agent.js"></script>
+<script src="/static/js/schemes.js"></script>
+<script src="/static/js/emergency.js"></script>
+<script src="/static/js/family.js"></script>
+<script src="/static/js/app.js"></script>
+
+</body>
+</html>
