@@ -1,4 +1,4 @@
-# 🏥 AarogyaConnect 360 - Universal Healthcare Ecosystem
+# Care360 - Universal Healthcare Ecosystem
 
 A full-stack medical application built to serve three distinct types of users:
 1. **Patients**
@@ -7,9 +7,9 @@ A full-stack medical application built to serve three distinct types of users:
 
 ---
 
-## 🌟 Architecture & Features Overview
+## Architecture & Features Overview
 
-### 1. 👤 For Patients (All 13 Requirements Satisfied)
+### 1.  For Patients (All 13 Requirements Satisfied)
 1. **Multilingual Voice AI Assistant (`ArogyaSarthi AI`)**:
    - Spoken input & vocal output in **English, हिन्दी (Hindi), বাংলা (Bengali), తెలుగు (Telugu), தமிழ் (Tamil), and मराठी (Marathi)**.
    - Diagnoses health complaints, recommends the nearest specialist doctor, and **speaks available consultation slots aloud for Today, Tomorrow, and the next 3 days**.
@@ -57,7 +57,7 @@ A full-stack medical application built to serve three distinct types of users:
 
 ---
 
-### 2. 🏥 For Hospitals & Physicians (All 5 Requirements Satisfied)
+### 2. For Hospitals & Physicians (All 5 Requirements Satisfied)
 1. **OPD Appointments & Queue Control Desk**:
     - Real-time overview of today's appointment roster.
     - **"Call Next Patient"** control: advances current token (e.g. from #39 to #40), instantly updating the patient's queue screen in real time.
@@ -78,7 +78,7 @@ A full-stack medical application built to serve three distinct types of users:
 
 ---
 
-### 3. 👨‍👩‍👧 For Immediate Family Members (All 4 Requirements Satisfied)
+### 3. For Immediate Family Members (All 4 Requirements Satisfied)
 1. **Dedicated View-Only Interface**:
     - Clean, read-only guardian interface preventing accidental data alteration.
 2. **Live Patient Status & Reports**:
@@ -91,18 +91,18 @@ A full-stack medical application built to serve three distinct types of users:
     - Protected by patient-configured **Guardian PIN (`CARE2026`)**.
     - Access is strictly restricted so confidential medical reports cannot reach unauthorized hands.
 
-### 4. 🧭 Universal Back-Navigation System (Added)
-- **Universal Breadcrumb & Back Bar**: Appears whenever you enter any sub-feature, showing `[ ← Back ]`, `[ 🏠 Home ]`, and clickable breadcrumbs.
+### 4. Universal Back-Navigation System (Added)
+- **Universal Breadcrumb & Back Bar**: Appears whenever you enter any sub-feature, showing `[ ← Back ]`, `[ Home ]`, and clickable breadcrumbs.
 - **Top & Bottom "← Back to Dashboard" buttons**: Placed on every single feature page (Voice AI, OPD Queue, Doctor Map, Prescriptions, Diet Plan, Health Trends, Health Locker, Govt Schemes, Insurance Desk, Care Companion, Emergency SOS).
 - **History Tracking (`App.goBack()`)**: Remembers where you were and takes you back to the exact previous view.
 - **Browser Native Back / Forward & Keyboard Esc**: Fully supports your browser's Back button and pressing `Esc` on the keyboard to return to the home overview.
 
 ---
 
-## 🚀 How to Run the Application
+## How to Run the Application
 
 The server is already running on your machine at:
-👉 **[http://127.0.0.1:8000](http://127.0.0.1:8000)**
+**[http://127.0.0.1:8000](http://127.0.0.1:8000)**
 
 To run or restart the server manually at any time:
 ```powershell
@@ -112,7 +112,7 @@ Open **[http://127.0.0.1:8000](http://127.0.0.1:8000)** in any modern web browse
 
 ---
 
-## 🧪 Quick Test / Walkthrough Guide
+## Quick Test / Walkthrough Guide
 
 1. **Role Switcher**: Click between **Patient**, **Hospital & Doctor**, and **Family (View-Only)** in the top navigation bar.
 2. **Voice AI Assistant**:
