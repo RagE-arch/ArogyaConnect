@@ -1,0 +1,114 @@
+/* AarogyaConnect 360 - Custom Styling & Animations */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --primary-blue: #0284c7;
+  --primary-teal: #0d9488;
+  --emergency-red: #ef4444;
+  --success-emerald: #10b981;
+  --warning-amber: #f59e0b;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background-color: #f8fafc;
+  color: #0f172a;
+}
+
+/* Glassmorphism cards */
+.glass-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+}
+
+.glass-dark-card {
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(51, 65, 85, 0.8);
+}
+
+/* Pulse animation for emergency buttons */
+@keyframes emergency-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 0 16px rgba(239, 68, 68, 0);
+    transform: scale(1.02);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+    transform: scale(1);
+  }
+}
+
+.animate-emergency-beacon {
+  animation: emergency-pulse 2s infinite cubic-bezier(0.4, 0, 0.6, 1);
+}
+
+/* Voice wave pulse */
+@keyframes voice-wave {
+  0%, 100% { height: 8px; }
+  50% { height: 32px; }
+}
+
+.wave-bar {
+  animation: voice-wave 1.2s ease-in-out infinite;
+}
+.wave-bar:nth-child(2) { animation-delay: 0.15s; }
+.wave-bar:nth-child(3) { animation-delay: 0.3s; }
+.wave-bar:nth-child(4) { animation-delay: 0.45s; }
+.wave-bar:nth-child(5) { animation-delay: 0.6s; }
+
+/* Custom Progress Bar for Queue */
+.queue-progress-bar {
+  background: linear-gradient(90deg, #0284c7 0%, #0d9488 50%, #10b981 100%);
+  background-size: 200% 100%;
+  animation: shimmer 2.5s infinite linear;
+}
+
+@keyframes shimmer {
+  0% { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
+
+/* Leaflet custom map marker container */
+.custom-leaflet-marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border-radius: 9999px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  border: 2px solid #0284c7;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Badge styles */
+.badge-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
