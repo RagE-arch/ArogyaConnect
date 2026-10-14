@@ -1,6 +1,6 @@
-# Care360 — Universal Healthcare Ecosystem
+# ArogyaConnect — Universal Healthcare Ecosystem
 
-Care360 is a full-stack healthcare application prototype designed around three user roles: **Patients**, **Hospitals & Physicians**, and **Immediate Family Members** with view-only access. It brings appointment management, health records, care coordination, AI-assisted guidance, and emergency workflows into one interface.
+ArogyaConnect is a full-stack healthcare application prototype designed around three user roles: **Patients**, **Hospitals & Physicians**, and **Immediate Family Members** with view-only access. It brings appointment management, health records, care coordination, AI-assisted guidance, and emergency workflows into one interface.
 
 > **Project note:** Features such as AI-generated health summaries, live location, ambulance dispatch, voice assistance, government-service integrations, and real-time synchronization depend on the implementation and connected services. Treat this project as a prototype unless those integrations have been independently configured and verified. It is not a substitute for professional medical advice or emergency services.
 
@@ -201,7 +201,7 @@ If the application does not start, confirm that you are in the directory contain
 
 ## Safety, Privacy & Security Notes
 
-Care360 handles concepts involving highly sensitive medical and identity information. Before production use:
+ArogyaConnect handles concepts involving highly sensitive medical and identity information. Before production use:
 
 - Never commit real patient records, prescriptions, identity documents, access tokens, API keys, or passwords to GitHub.
 - Replace demonstration PINs with secure authentication, authorization, and patient-controlled consent.
@@ -224,4 +224,4 @@ Care360 handles concepts involving highly sensitive medical and identity informa
 
 ---
 
-**Care360 — bringing patients, healthcare professionals, and trusted family members into one coordinated care experience.**
+**ArogyaConnect — bringing patients, healthcare professionals, and trusted family members into one coordinated care experience.**
